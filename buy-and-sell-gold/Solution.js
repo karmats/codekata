@@ -13,33 +13,32 @@ function Solution() {
         if (!priceOnDay) {
             throw new Error('Price on day must be defined');
         }
-        sells[i] = api.getPriceOnDay(i);
+        sells[i] = priceOnDay;
     }
 
     // Calculate the best result buy going through the whole array with gold price data
     // and check which buy day that gives the largest profit with sell day
-    this.bestResult = sells
+    this.bestProfit = sells
     .map((sell, buyDay) => {
-        let bestDiff = {
+        let bestProfit = {
             buyDay: buyDay,
-            sellDay: 0,
-            profit: 0
+            sellDay: buyDay,
         }
         for (let sellDay = buyDay; sellDay < sells.length; sellDay++) {
             const profit = sells[sellDay] - sell;
-            if (profit > bestDiff.profit) {
-                bestDiff.sellDay = sellDay;
-                bestDiff.profit = profit;
+            if (!bestProfit.profit || profit > bestProfit.profit) {
+                bestProfit.sellDay = sellDay;
+                bestProfit.profit = profit;
             }
         }
-        return bestDiff;
+        return bestProfit;
     })
     .reduce((p, c) => {
-        if (c.profit > p.profit) {
+        if (!p.profit || c.profit > p.profit) {
             return c;
         }
         return p;
-    }, { profit: -1 })
+    }, { })
 }
 
 /**
@@ -49,7 +48,7 @@ function Solution() {
  * @returns {int}
  */
 Solution.prototype.getBuyDay = function() {
-    return this.bestResult.buyDay;
+    return this.bestProfit.buyDay;
 };
 /**
  * Return the day to sell gold on. This day has to be after (greater than) the 
@@ -59,7 +58,7 @@ Solution.prototype.getBuyDay = function() {
  * @returns {int}
  */
 Solution.prototype.getSellDay = function() {
-    return this.bestResult.sellDay;
+    return this.bestProfit.sellDay;
 }
 
 module.exports = Solution;
